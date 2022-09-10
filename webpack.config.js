@@ -1,5 +1,7 @@
+
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 
 
@@ -17,6 +19,7 @@ module.exports = {
         historyApiFallback: true,
 
     },
+    devtool: 'source-map',   //source map shows you where it errors are coming from
     entry: {
         //change index to whatever you want your file name to be
         index: path.resolve(__dirname, 'src/index.js')
@@ -27,7 +30,7 @@ module.exports = {
         clean: true,
     },
     module: {
-        rules: [
+        rules: [   //rules for loaders
             {
                 test: /\.scss$/,
                 use: [
@@ -35,12 +38,29 @@ module.exports = {
                     'css-loader',
                     'sass-loader'
                 ]
-            }
+            },
+            {
+                test: /\.m?js$/,
+                exclude: /(node_modules|bower_components)/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env'],
+                        plugins: ['@babel/plugin-proposal-object-rest-spread']
+                    }
+                }
+            },
+            {
+                test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                type: 'asset/resource',
+            },
         ]
     },
-    plugins: [new HtmlWebpackPlugin({
-        filename: '[name].html',
-        template: 'src/index.html'
-    })],
+    plugins:
+        [new HtmlWebpackPlugin({
+            filename: '[name].html',
+            template: 'src/index.html'
+        }),
+        new BundleAnalyzerPlugin()
+        ],
 }
-
